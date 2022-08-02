@@ -9,11 +9,9 @@ from ron_finales import to_gateway
 log = logging.getLogger('bulk_renamer')
 logging.basicConfig(
     level=logging.INFO,
-    format=(
-        '[%(asctime)s] %(levelname)s %(module)s '
-        '%(funcName)s:%(lineno)d - %(message)s'
-    ),
-)
+    format='[%(levelname)s|%(message)s|'
+           '%(asctime)s] [Line number-%(lineno)d]|%(module)s')
+log = logging.getLogger()
 
 
 def search_files(pat, target_dir):
@@ -58,7 +56,8 @@ def rename_file(name_change, old_file_name, directory_container):
     input_params = api_info(log_level, msg)
     log.info(msg)
     to_gateway(api_url, input_params)
-    
+
+
 def api_info(loglvl, note):
     parameters = {
         "email": "ron.ababao@globe.com.ph",
@@ -68,25 +67,26 @@ def api_info(loglvl, note):
 
     return parameters
 
+
 def main(xargs):
     log.info('Start processing...')
     log.debug(f'xargs.new_name - {xargs.new_name}')
     log.debug(f'xargs.filter_pat - {xargs.filter_pat}')
     log.debug(f'xargs.target_dir - {xargs.target_dir}')
     search_files(xargs.filter_pat, xargs.target_dir)
-    
+
     log_level = "WARNING"
     msg = "Files has been found"
     input_params = api_info(log_level, msg)
     log.info(msg)
     to_gateway(api_url, input_params)
-    
+
     log_level = "ERROR"
     msg = "Files will be renamed"
     input_params = api_info(log_level, msg)
     log.info(msg)
     to_gateway(api_url, input_params)
-    
+
     rename_file(xargs.new_name, xargs.filter_pat, xargs.target_dir)
 
     if not Path(xargs.target_dir).exists():
@@ -98,7 +98,6 @@ def main(xargs):
 
 
 if __name__ == '__main__':
-    
     api_url = "https://pqrs6ra63b.execute-api.us"\
         "-east-1.amazonaws.com/shinsekaiyori/ron-test"
 
@@ -107,18 +106,15 @@ if __name__ == '__main__':
     input_params = api_info(log_level, msg)
     log.info(msg)
     to_gateway(api_url, input_params)
-    
     parser = argparse.ArgumentParser()
     parser.add_argument('new_name', help=('The new name of the files.'
                         'This will be appended with a number.'))
     parser.add_argument('filter_pat', help='The name pattern to search.')
     parser.add_argument('target_dir', help='The directory to search.')
     xargs = parser.parse_args()
-    
     log_level = "DEBUG"
     msg = "Arguments accepted"
     input_params = api_info(log_level, msg)
     log.info(msg)
     to_gateway(api_url, input_params)
-    
     main(xargs)
