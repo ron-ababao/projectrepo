@@ -2,11 +2,13 @@ import csv
 import requests
 import logging
 from ron_finales import to_gateway
+from dynamic_table import dynamic
 
-logging.basicConfig(filename="log-file.txt",
+logfile = "log-file.log"
+logging.basicConfig(filename=logfile,
                     level=logging.INFO,
-                    format='[%(asctime)s]|%(levelname)s|\
-                    %(module)s|%(lineno)d|%(message)s',)
+                    format='%(levelname)s|%(message)s|'
+                    '[%(asctime)s] [Line number-%(lineno)d]|%(module)s')
 log = logging.getLogger()
 
 
@@ -39,11 +41,10 @@ def create_output_file(headers, valid_products):
             writer.writerows(valid_products)
     else:
         print('No valid products found!')
-    log.critical(f"Output file written in: {out_file}")
     log_level = "CRITICAL"
     msg = "Clean file has been made"
     input_params = api_info(log_level, msg)
-    log.info(msg)
+    log.critical(msg)
     to_gateway(api_url, input_params)
 
 
@@ -55,7 +56,6 @@ def main(data_file):
     to_gateway(api_url, input_params)
     headers, valid_products = process_valid_products(data_file)
     create_output_file(headers, valid_products)
-    
 
 
 def api_info(loglvl, note):
@@ -86,7 +86,6 @@ if __name__ == '__main__':
     url_content = data_file_req.content
     csv_file = open('raw_file.csv', 'wb').write(url_content)
     data_file = 'raw_file.csv'
-
     log_level = "DEBUG"
     msg = "Link instantiated"
     input_params = api_info(log_level, msg)
@@ -94,3 +93,4 @@ if __name__ == '__main__':
     to_gateway(api_url, input_params)
 
     main(data_file)
+    dynamic(logfile)
